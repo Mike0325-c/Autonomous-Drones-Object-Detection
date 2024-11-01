@@ -11,7 +11,7 @@ OUTPUT_SIZE = (765, 1360)  # Height, Width
 SCALE_RANGE = (0.5, 0.5)
 FILTER_TINY_SCALE = 1 / 50  # if height or width lower than this scale, drop it.
 
-ANNO_DIR = r'D:\self_document\Australia\UNSW\2024\T3\COMP9444\group_p\VisDrone2019-DET-train\Mosaic_text'#需要被增强的文件的描述文件
+ANNO_DIR = r'D:\self_document\Australia\UNSW\2024\T3\COMP9444\group_p\VisDrone2019-DET-train\Augmentation_text'#需要被增强的文件的描述文件
 IMG_DIR = r'D:\self_document\Australia\UNSW\2024\T3\COMP9444\group_p\VisDrone2019-DET-train\Augmentation_img'#需要被增强的文件的图片文件
 # category_name = ['background', 'person']
 
@@ -35,7 +35,7 @@ def main():
         new_image, new_annos = update_image_and_anno(img_paths, annos, idxs, OUTPUT_SIZE, SCALE_RANGE, filter_scale=FILTER_TINY_SCALE)
 
         # 保存不含标注框的新图像
-        img_save_path = os.path.join(img_save_dir, f'wind_output2_{i}.jpg')########命名格式
+        img_save_path = os.path.join(img_save_dir, f'wind_output_{i}.jpg')########命名格式
         cv2.imwrite(img_save_path, new_image)
 
         # 在图像上绘制边界框
@@ -45,15 +45,15 @@ def main():
             cv2.rectangle(new_image, start_point, end_point, (0, 255, 0), 1, cv2.LINE_AA)
 
         # 保存带标注框的图像
-        bbox_img_save_path = os.path.join(bbox_img_save_dir, f'wind_output_bbox2_{i}.jpg')########命名格式
+        bbox_img_save_path = os.path.join(bbox_img_save_dir, f'wind_output_bbox_{i}.jpg')########命名格式
         cv2.imwrite(bbox_img_save_path, new_image)
 
         # 保存描述文件
-        anno_save_path = os.path.join(anno_save_dir, f'wind_output2_{i}.txt')########命名格式
+        anno_save_path = os.path.join(anno_save_dir, f'wind_output_{i}.txt')########命名格式
         with open(anno_save_path, 'w') as f:
             for anno in new_annos:
                 # 将每个边界框按格式写入文件，格式为：类别ID, xmin, ymin, xmax, ymax
-                f.write(f"{anno[0]},{anno[1]:.6f},{anno[2]:.6f},{anno[3]:.6f},{anno[4]:.6f}\n")
+                f.write(f"{anno[0]},{anno[1]:.6f},{anno[2]:.6f},{anno[3]:.6f},{anno[4]:.6f},{anno[5]},{anno[6]},{anno[7]}\n")
                 # f.write(f"{anno[0]},{anno[1]},{anno[2]},{anno[3]},{anno[4]}\n")
 
 
@@ -84,7 +84,7 @@ def update_image_and_anno(all_img_list, all_annos, idxs, output_size, scale_rang
                 ymin = bbox[2] * scale_y
                 xmax = bbox[3] * scale_x
                 ymax = bbox[4] * scale_y
-                new_anno.append([bbox[0], xmin, ymin, xmax, ymax])
+                new_anno.append([bbox[0], xmin, ymin, xmax, ymax,bbox[5],bbox[6],bbox[7]])
 
         elif i == 1:  # top-right
             img = cv2.resize(img, (output_size[1] - divid_point_x, divid_point_y))
@@ -94,7 +94,7 @@ def update_image_and_anno(all_img_list, all_annos, idxs, output_size, scale_rang
                 ymin = bbox[2] * scale_y
                 xmax = scale_x + bbox[3] * (1 - scale_x)
                 ymax = bbox[4] * scale_y
-                new_anno.append([bbox[0], xmin, ymin, xmax, ymax])
+                new_anno.append([bbox[0], xmin, ymin, xmax, ymax,bbox[5],bbox[6],bbox[7]])
         elif i == 2:  # bottom-left
             img = cv2.resize(img, (divid_point_x, output_size[0] - divid_point_y))
             output_img[divid_point_y:output_size[0], :divid_point_x, :] = img
@@ -103,7 +103,7 @@ def update_image_and_anno(all_img_list, all_annos, idxs, output_size, scale_rang
                 ymin = scale_y + bbox[2] * (1 - scale_y)
                 xmax = bbox[3] * scale_x
                 ymax = scale_y + bbox[4] * (1 - scale_y)
-                new_anno.append([bbox[0], xmin, ymin, xmax, ymax])
+                new_anno.append([bbox[0], xmin, ymin, xmax, ymax,bbox[5],bbox[6],bbox[7]])
         else:  # bottom-right
             img = cv2.resize(img, (output_size[1] - divid_point_x, output_size[0] - divid_point_y))
             output_img[divid_point_y:output_size[0], divid_point_x:output_size[1], :] = img
@@ -112,7 +112,7 @@ def update_image_and_anno(all_img_list, all_annos, idxs, output_size, scale_rang
                 ymin = scale_y + bbox[2] * (1 - scale_y)
                 xmax = scale_x + bbox[3] * (1 - scale_x)
                 ymax = scale_y + bbox[4] * (1 - scale_y)
-                new_anno.append([bbox[0], xmin, ymin, xmax, ymax])
+                new_anno.append([bbox[0], xmin, ymin, xmax, ymax,bbox[5],bbox[6],bbox[7]])
 
     return output_img, new_anno
 def get_dataset(anno_dir, img_dir):
@@ -149,7 +149,9 @@ def get_dataset(anno_dir, img_dir):
                 height = int(values[4]) / img_height
                 xmax = min(xmin + width, 1.0)  # 确保坐标不超过边界
                 ymax = min(ymin + height, 1.0)#归一化
-
+                aaa=int(values[5])
+                bbbb=int(values[6])
+                ccc=int(values[7])
                 # categories_id = int(values[0])
                 # xmin = max(int(values[1]), 0)  # 不进行归一化
                 # ymin = max(int(values[2]), 0)  # 不进行归一化
@@ -159,7 +161,7 @@ def get_dataset(anno_dir, img_dir):
                 # ymax = ymin + height#非归一化
 
                 # 将每个框的信息存入boxes列表
-                boxes.append([categories_id, xmin, ymin, xmax, ymax])
+                boxes.append([categories_id, xmin, ymin, xmax, ymax,aaa,bbbb,ccc])
                 print(f"Processed box: {boxes[-1]}")
 
         # 如果有标注框信息，将图像路径和标注添加到结果列表

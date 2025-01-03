@@ -18,7 +18,7 @@ Testing: 1,580 images
 It includes 12 object categories (e.g., pedestrian, car, bicycle, etc.). Some categories, like "ignored regions" and "others," are excluded from the evaluation.
 
 The dataset has some imbalanced categories, meaning some objects (like people and cars) are more common than others (like tricycles).
-**dataset link**: https://github.com/VisDrone/VisDrone-Dataset?tab=readme-ov-file
+**Dataset link**: https://github.com/VisDrone/VisDrone-Dataset?tab=readme-ov-file
 
-**Goal**
+## Goal
 The aim is to develop a system that can detect objects in drone images accurately, even with changes in altitude, speed, and environment, using deep learning models trained on the VisDrone dataset.
